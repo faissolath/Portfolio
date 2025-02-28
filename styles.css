@@ -94,64 +94,78 @@
         }
 
         /* Section CV et Contact */
-        #cv-contact {
-            background-color: #6c757d; /* Couleur de fond */
-            color: white; /* Couleur du texte */
-            padding: 80px 0; /* Espacement interne */
-        }
+            #cv_contact {
+                background-color: #6c757d; /* Couleur de fond */
+                color: white; /* Couleur du texte */
+                padding: 80px 0; /* Espacement interne */
+            }
 
-        #cv-contact .row {
-            display: flex;
-            align-items: center; /* Centrer verticalement les colonnes */
-        }
+            #cv_contact .row {
+                display: flex;
+                align-items: stretch; /* Étirer les colonnes pour qu'elles aient la même hauteur */
+            }
 
-        #cv-contact .col-md-6 {
-            padding: 20px; /* Espacement interne pour chaque colonne */
-        }
+            #cv_contact .col-md-6 {
+                padding: 20px; /* Espacement interne pour chaque colonne */
+            }
 
-        #cv-contact .btn-light {
-            background-color: white;
-            color: #6c757d;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
-            transition: background-color 0.3s ease, color 0.3s ease;
-        }
+            #cv_contact .btn-light {
+                background-color: white;
+                color: #6c757d;
+                border: none;
+                padding: 10px 20px;
+                border-radius: 5px;
+                transition: background-color 0.3s ease, color 0.3s ease;
+            }
 
-        #cv-contact .btn-light:hover {
-            background-color: #f8f9fa;
-            color: #6c757d;
-        }
+            #cv_contact .btn-light:hover {
+                background-color: rgba(0, 0, 0, 0.1);
+                color: #6c757d;
+            }
 
-        #cv-contact .btn-primary {
-            background-color: #007bff;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
-            transition: background-color 0.3s ease;
-        }
+            #cv_contact .btn-primary {
+                background-color: #f8f9fa;
+                color: #6c757d;
+                border: none;
+                padding: 10px 20px;
+                border-radius: 5px;
+                transition: background-color 0.3s ease;
+            }
 
-        #cv-contact .btn-primary:hover {
-            background-color: #0056b3;
-        }
+            #cv_contact .btn-primary:hover {
+                background-color: rgba(0, 0, 0, 0.1);
+                color: #6c757d;
+            }
 
-        .contact-info {
-            display: flex;
-            flex-direction: column; /* Afficher les infos de contact les unes sous les autres */
-            gap: 10px; /* Espace entre les éléments */
-            margin-bottom: 20px; /* Espace sous les infos de contact */
-        }
+            .contact-info {
+                display: flex;
+                flex-direction: column; /* Afficher les infos de contact les unes sous les autres */
+                gap: 10px; /* Espace entre les éléments */
+                margin-bottom: 20px; /* Espace sous les infos de contact */
+                margin-left: 25%;
+            }
 
-        .contact-info p {
-            margin: 0;
-            display: flex;
-            align-items: center;
-            gap: 10px; /* Espace entre l'icône et le texte */
-        }
+            .contact-info p {
+                margin: 0;
+                display: flex;
+                align-items: center;
+                gap: 10px; /* Espace entre l'icône et le texte */
+            }
 
-        .contact-info .bi {
-            font-size: 24px; /* Taille des icônes */
-        }
+            .contact-info .bi {
+                font-size: 24px; /* Taille des icônes */
+            }
+
+            .conv{
+                opacity: 0; /* Masquer la section initialement */
+                transform: translateY(20px); /* Décaler légèrement vers le bas */
+                transition: opacity 1s ease-out, transform 1s ease-out;
+            }
+
+            .conv.visible {
+                opacity: 1; /* Rendre la section visible */
+                transform: translateY(0); /* Remettre à la position d'origine */
+            }
 
 /* Animation pour la section Formation */
     @keyframes fadeInUp {
@@ -190,8 +204,8 @@
     left: 0;
     width: 100%;
     height: 100vh;
-    background: #000;
-    color: white;
+    background: #353232;
+    color: rgb(196, 192, 192);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -223,16 +237,16 @@
 
 /* SECTION À PROPOS */
 .about-section {
-    padding: 80px 0;
-    background-color: #f8f9fa;
-    opacity: 0;
-    transform: translateY(50px);
+    background-color: #e9ecef; /* Couleur de fond */
+    padding: 80px 0; /* Espacement interne */
+    opacity: 0; /* Masquer la section initialement */
+    transform: translateY(20px); /* Décaler légèrement vers le bas */
     transition: opacity 1s ease-out, transform 1s ease-out;
 }
 
 .about-section.visible {
-    opacity: 1;
-    transform: translateY(0);
+    opacity: 1; /* Rendre la section visible */
+    transform: translateY(0); /* Remettre à la position d'origine */
 }
 
 .profile-pic {
@@ -287,6 +301,14 @@
     padding: 80px 0;
     background: #f8f9fa;
     text-align: center;
+    opacity: 0; /* Masquer la section initialement */
+    transform: translateY(20px); /* Décaler légèrement vers le bas */
+    transition: opacity 1s ease-out, transform 1s ease-out;
+}
+
+.services-section.visible {
+    opacity: 1; /* Rendre la section visible */
+    transform: translateY(0); /* Remettre à la position d'origine */
 }
 
 .service-box {
@@ -354,4 +376,16 @@
 #skills .container {
     position: relative;
     z-index: 1;
+}
+.competences{
+   /* background-color: #e9ecef; /* Couleur de fond */
+    /*padding: 80px 0; /* Espacement interne */
+    opacity: 0; /* Masquer la section initialement */
+    transform: translateY(20px); /* Décaler légèrement vers le bas */
+    transition: opacity 1s ease-out, transform 1s ease-out;
+}
+
+.competences.visible {
+    opacity: 1; /* Rendre la section visible */
+    transform: translateY(0); /* Remettre à la position d'origine */
 }
