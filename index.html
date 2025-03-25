@@ -185,9 +185,19 @@
                     <div id="cv" class="text-center h-100 d-flex flex-column justify-content-center">
                         <h2>Mon CV</h2><br>
                         <p>Téléchargez mon CV en cliquant sur le bouton ci-dessous :</p>
-                        <a href="CV_F.pdf" class="btn btn-light" download="Mon_CV.pdf">Télécharger mon CV</a>
+                        <a href="CV_F.pdf" id="downloadLink" class="btn btn-light" download="Mon_CV.pdf">Télécharger mon CV</a>
                     </div>
                 </div>
+                
+                <script>
+                  document.getElementById('downloadLink').addEventListener('click', function(e) {
+                    e.preventDefault(); // Empêcher le comportement par défaut (suivre le lien)
+                    var url = this.href;
+                    var newUrl = url.split('?')[0] + '?ver=' + new Date().getTime(); // Ajoute un paramètre de version
+                    this.href = newUrl;
+                    window.location.href = newUrl; // Déclenche le téléchargement avec la nouvelle URL
+                  });
+                </script>
 
                 <!-- Section Contact -->
                 <div class="col-md-6 h-100">
