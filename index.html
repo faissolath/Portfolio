@@ -205,30 +205,50 @@
             </div>
         </div>
     </section>
+    <!-- JavaScript -->
     <script>
-        document.getElementById('downloadBtn').addEventListener('click', function() {
-            // Créer un lien temporaire
-            const link = document.createElement('a');
-            link.href = 'CV_F.pdf';
-            link.download = 'CV_Faissolath_ADEOTI.pdf'; // Nom personnalisé pour le fichier téléchargé
-            
-            // Ajouter un timestamp pour éviter la mise en cache
-            link.href = link.href + '?t=' + new Date().getTime();
-            
-            // Déclencher le téléchargement
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            
-            // Solution alternative pour iOS
-            if (navigator.userAgent.match(/(iPod|iPhone|iPad)/i)) {
-                const iframe = document.createElement('iframe');
-                iframe.style.display = 'none';
-                iframe.src = link.href;
-                document.body.appendChild(iframe);
-                setTimeout(() => document.body.removeChild(iframe), 100);
-            }
-        });
+    document.getElementById('downloadBtn').addEventListener('click', function() {
+        // 1. Afficher un indicateur de chargement (optionnel)
+        this.innerHTML = 'Téléchargement en cours...';
+        
+        // 2. Solution Blob + Fallback pour iOS
+        fetch('CV_F.pdf?' + new Date().getTime()) // Anti-cache
+            .then(response => {
+                if (!response.ok) throw new Error('Erreur de réseau');
+                return response.blob();
+            })
+            .then(blob => {
+                // Méthode standard
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.style.display = 'none';
+                a.href = url;
+                a.download = 'CV_Faissolath_ADEOTI.pdf';
+                
+                document.body.appendChild(a);
+                a.click();
+                
+                // Nettoyage
+                setTimeout(() => {
+                    document.body.removeChild(a);
+                    window.URL.revokeObjectURL(url);
+                    this.innerHTML = 'Télécharger mon CV';
+                }, 100);
+                
+                // Fallback pour iOS si le click ne fonctionne pas
+                setTimeout(() => {
+                    if (navigator.userAgent.match(/iPhone|iPad|iPod/i)) {
+                        window.open(url, '_blank');
+                    }
+                }, 500);
+            })
+            .catch(error => {
+                console.error('Erreur:', error);
+                this.innerHTML = 'Erreur - Réessayer';
+                // Fallback vers le fichier direct
+                window.open('CV_F.pdf', '_blank');
+            });
+    });
     </script>
         
     <footer class="bg-dark text-white text-center py-3">
