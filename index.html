@@ -186,7 +186,12 @@
                         <h2>Mon CV</h2><br>
                         <p>Téléchargez mon CV en cliquant sur le bouton ci-dessous :</p>
                         <!--<a href="CV_F.pdf" id="downloadLink" class="btn btn-light" download="Mon_CV.pdf">Télécharger mon CV</a>-->
-                        <button id="downloadBtn" class="btn btn-light">Télécharger mon CV</button>
+                        <!--<button id="downloadBtn" class="btn btn-light">Télécharger mon CV</button>-->
+                        <!-- Bouton de téléchargement -->
+                        <button id="downloadBtn" class="btn btn-light">
+                            <span id="downloadText">Télécharger mon CV</span>
+                            <span id="downloadSpinner" class="spinner-border spinner-border-sm d-none" role="status"></span>
+                        </button>
                     </div>
                 </div>
 
@@ -207,49 +212,87 @@
     </section>
     <!-- JavaScript -->
     <script>
-    document.getElementById('downloadBtn').addEventListener('click', function() {
-        // 1. Afficher un indicateur de chargement (optionnel)
-        this.innerHTML = 'Téléchargement en cours...';
+        document.getElementById('downloadBtn').addEventListener('click', async function() {
+            const btn = this;
+            const textEl = document.getElementById('downloadText');
+            const spinner = document.getElementById('downloadSpinner');
+            
+            // Préparation UI
+            btn.disabled = true;
+            textEl.textContent = 'Préparation...';
+            spinner.classList.remove('d-none');
+            
+            try {
+                // Essai méthode Blob (pour la plupart des navigateurs)
+                await downloadWithBlob();
+                textEl.textContent = 'Téléchargement réussi!';
+            } catch (error) {
+                console.error('Méthode Blob échouée:', error);
+                
+                // Fallback 1: Nouvel onglet
+                try {
+                    textEl.textContent = 'Ouverture dans un nouvel onglet...';
+                    window.open('CV_F.pdf?' + new Date().getTime(), '_blank');
+                    textEl.textContent = 'Ouvrir mon CV';
+                } catch (e) {
+                    console.error('Fallback échoué:', e);
+                    
+                    // Fallback 2: Lien direct
+                    textEl.textContent = 'Redirection...';
+                    window.location.href = 'CV_F.pdf?' + new Date().getTime();
+                }
+            } finally {
+                setTimeout(() => {
+                    btn.disabled = false;
+                    textEl.textContent = 'Télécharger mon CV';
+                    spinner.classList.add('d-none');
+                }, 3000);
+            }
+        });
         
-        // 2. Solution Blob + Fallback pour iOS
-        fetch('CV_F.pdf?' + new Date().getTime()) // Anti-cache
-            .then(response => {
-                if (!response.ok) throw new Error('Erreur de réseau');
-                return response.blob();
-            })
-            .then(blob => {
-                // Méthode standard
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.style.display = 'none';
-                a.href = url;
-                a.download = 'CV_Faissolath_ADEOTI.pdf';
+        async function downloadWithBlob() {
+            return new Promise((resolve, reject) => {
+                // Ajout d'un timestamp pour éviter le cache
+                const url = 'CV_F.pdf?' + new Date().getTime();
                 
-                document.body.appendChild(a);
-                a.click();
-                
-                // Nettoyage
-                setTimeout(() => {
-                    document.body.removeChild(a);
-                    window.URL.revokeObjectURL(url);
-                    this.innerHTML = 'Télécharger mon CV';
-                }, 100);
-                
-                // Fallback pour iOS si le click ne fonctionne pas
-                setTimeout(() => {
-                    if (navigator.userAgent.match(/iPhone|iPad|iPod/i)) {
-                        window.open(url, '_blank');
-                    }
-                }, 500);
-            })
-            .catch(error => {
-                console.error('Erreur:', error);
-                this.innerHTML = 'Erreur - Réessayer';
-                // Fallback vers le fichier direct
-                window.open('CV_F.pdf', '_blank');
+                fetch(url)
+                    .then(response => {
+                        if (!response.ok) throw new Error('Erreur réseau');
+                        return response.blob();
+                    })
+                    .then(blob => {
+                        // Création du lien invisible
+                        const blobUrl = window.URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.style.display = 'none';
+                        a.href = blobUrl;
+                        a.download = 'CV_Faissolath_ADEOTI.pdf';
+                        
+                        // Déclenchement
+                        document.body.appendChild(a);
+                        a.click();
+                        
+                        // Nettoyage
+                        setTimeout(() => {
+                            document.body.removeChild(a);
+                            window.URL.revokeObjectURL(blobUrl);
+                            resolve();
+                        }, 100);
+                    })
+                    .catch(reject);
             });
-    });
-    </script>
+        }
+        </script>
+        
+        <style>
+        .spinner-border {
+            vertical-align: middle;
+            margin-left: 8px;
+        }
+        .d-none {
+            display: none;
+        }
+        </style>
         
     <footer class="bg-dark text-white text-center py-3">
         <div class="social-icons">
