@@ -212,76 +212,127 @@
     </section>
     <!-- JavaScript -->
     <script>
-        document.getElementById('downloadBtn').addEventListener('click', async function() {
-            const btn = this;
-            const textEl = document.getElementById('downloadText');
-            const spinner = document.getElementById('downloadSpinner');
-            
-            // Préparation UI
-            btn.disabled = true;
-            textEl.textContent = 'Préparation...';
-            spinner.classList.remove('d-none');
-            
-            try {
-                // Essai méthode Blob (pour la plupart des navigateurs)
-                await downloadWithBlob();
-                textEl.textContent = 'Téléchargement réussi!';
-            } catch (error) {
-                console.error('Méthode Blob échouée:', error);
+       // ===== [1. ADAPTATION DYNAMIQUE] =====
+            function adjustLayout() {
+                const screenWidth = window.innerWidth;
+                const serviceTitles = document.querySelectorAll('.service-box h4');
                 
-                // Fallback 1: Nouvel onglet
-                try {
-                    textEl.textContent = 'Ouverture dans un nouvel onglet...';
-                    window.open('CV_F.pdf?' + new Date().getTime(), '_blank');
-                    textEl.textContent = 'Ouvrir mon CV';
-                } catch (e) {
-                    console.error('Fallback échoué:', e);
+                // Ajustements pour très petits écrans (<400px)
+                if (screenWidth < 400) {
+                    serviceTitles.forEach(el => {
+                        el.style.fontSize = '1.2rem';
+                    });
                     
-                    // Fallback 2: Lien direct
-                    textEl.textContent = 'Redirection...';
-                    window.location.href = 'CV_F.pdf?' + new Date().getTime();
+                    // Ajoutez d'autres ajustements spécifiques ici
+                    document.querySelectorAll('.timeline-card').forEach(card => {
+                        card.style.padding = '15px 10px';
+                    });
+                } else {
+                    // Réinitialiser les styles si on revient à un écran plus grand
+                    serviceTitles.forEach(el => {
+                        el.style.fontSize = '';
+                    });
                 }
-            } finally {
-                setTimeout(() => {
-                    btn.disabled = false;
-                    textEl.textContent = 'Télécharger mon CV';
-                    spinner.classList.add('d-none');
-                }, 3000);
-            }
-        });
-        
-        async function downloadWithBlob() {
-            return new Promise((resolve, reject) => {
-                // Ajout d'un timestamp pour éviter le cache
-                const url = 'CV_F.pdf?' + new Date().getTime();
                 
-                fetch(url)
-                    .then(response => {
-                        if (!response.ok) throw new Error('Erreur réseau');
-                        return response.blob();
-                    })
-                    .then(blob => {
-                        // Création du lien invisible
-                        const blobUrl = window.URL.createObjectURL(blob);
-                        const a = document.createElement('a');
-                        a.style.display = 'none';
-                        a.href = blobUrl;
-                        a.download = 'CV_Faissolath_ADEOTI.pdf';
-                        
-                        // Déclenchement
-                        document.body.appendChild(a);
-                        a.click();
-                        
-                        // Nettoyage
-                        setTimeout(() => {
-                            document.body.removeChild(a);
-                            window.URL.revokeObjectURL(blobUrl);
+                // Adaptation supplémentaire pour la timeline sur mobiles
+                if (screenWidth < 768) {
+                    const timeline = document.querySelector('.timeline');
+                    if (timeline) {
+                        timeline.style.padding = '20px 0';
+                    }
+                }
+            }
+
+            // ===== [2. ANIMATION TIMELINE] ===== 
+            function animateFormation() {
+                const formationSection = document.getElementById('formation');
+                if (!formationSection) return;
+
+                const timelineCards = document.querySelectorAll('.timeline-card');
+                if (!timelineCards.length) return;
+
+                const observer = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            timelineCards.forEach((card, index) => {
+                                setTimeout(() => {
+                                    card.classList.add('visible');
+                                }, index * 150); // Délai progressif
+                            });
+                            observer.unobserve(entry.target);
+                        }
+                    });
+                }, { threshold: 0.3 });
+
+                observer.observe(formationSection);
+            }
+
+            // ===== [3. TÉLÉCHARGEMENT DU CV] =====
+            async function handleDownload() {
+                const btn = document.getElementById('downloadBtn');
+                if (!btn) return;
+
+                const textEl = document.getElementById('downloadText');
+                const spinner = document.getElementById('downloadSpinner');
+                
+                try {
+                    btn.disabled = true;
+                    textEl.textContent = 'Préparation...';
+                    spinner?.classList.remove('d-none');
+
+                    // Solution Blob avec fallback
+                    await downloadWithBlob();
+                    textEl.textContent = 'Téléchargé!';
+                } catch (error) {
+                    console.error('Échec du téléchargement:', error);
+                    textEl.textContent = 'Ouvrir le CV';
+                    window.open('CV_F.pdf?' + Date.now(), '_blank');
+                } finally {
+                    setTimeout(() => {
+                        btn.disabled = false;
+                        textEl.textContent = 'Télécharger mon CV';
+                        spinner?.classList.add('d-none');
+                    }, 2000);
+                }
+            }
+
+            async function downloadWithBlob() {
+                return new Promise((resolve, reject) => {
+                    fetch('CV_F.pdf?' + Date.now())
+                        .then(response => {
+                            if (!response.ok) throw new Error('Erreur: ' + response.status);
+                            return response.blob();
+                        })
+                        .then(blob => {
+                            const url = URL.createObjectURL(blob);
+                            const a = document.createElement('a');
+                            a.href = url;
+                            a.download = 'CV_Faissolath_ADEOTI.pdf';
+                            a.click();
+                            setTimeout(() => URL.revokeObjectURL(url), 100);
                             resolve();
-                        }, 100);
-                    })
-                    .catch(reject);
+                        })
+                        .catch(reject);
+                });
+            }
+
+            // ===== [INITIALISATION] =====
+            document.addEventListener('DOMContentLoaded', () => {
+                // 1. Adaptation dynamique initiale
+                adjustLayout();
+                
+                // 2. Animation de la timeline
+                animateFormation();
+                
+                // 3. Écouteur pour le bouton de téléchargement
+                const downloadBtn = document.getElementById('downloadBtn');
+                if (downloadBtn) {
+                    downloadBtn.addEventListener('click', handleDownload);
+                }
+                
+                // 4. Ré-adaptation lors du redimensionnement
+                window.addEventListener('resize', adjustLayout);
             });
-        }
         </script>
         
         <style>
